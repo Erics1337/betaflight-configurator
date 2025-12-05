@@ -68,13 +68,13 @@ export function mountVueTab(tabName, contentReadyCallback) {
 
     console.log(`[Vue Tab] Mounted: ${tabName}`);
 
-    // Call content ready callback after next tick to ensure DOM is updated
-    if (contentReadyCallback) {
-        setTimeout(() => {
-            GUI.tab_switch_in_progress = false;
+    // Reset tab switch flag and call content ready callback after next tick
+    setTimeout(() => {
+        GUI.tab_switch_in_progress = false;
+        if (contentReadyCallback) {
             contentReadyCallback();
-        }, 0);
-    }
+        }
+    }, 0);
 
     return true;
 }
