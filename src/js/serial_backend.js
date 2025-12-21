@@ -35,8 +35,8 @@ let liveDataRefreshTimerId = false;
 
 let isConnected = false;
 
-const REBOOT_CONNECT_MAX_TIME_MS = 10000;
-const REBOOT_GRACE_PERIOD_MS = 2000;
+export const REBOOT_CONNECT_MAX_TIME_MS = 60000;
+export const REBOOT_GRACE_PERIOD_MS = 1500;
 let rebootTimestamp = 0;
 
 function isCliOnlyMode() {
@@ -125,12 +125,6 @@ function connectDisconnect() {
         } else {
             // prevent connection when we do not have permission
             if (selectedPort.startsWith("requestpermission")) {
-                return;
-            }
-
-            // When rebooting, adhere to the auto-connect setting
-            if (!PortHandler.portPicker.autoConnect && Date.now() - rebootTimestamp < REBOOT_GRACE_PERIOD_MS) {
-                console.log(`${logHead} Rebooting, not connecting`);
                 return;
             }
 
@@ -808,10 +802,15 @@ export function reinitializeConnection() {
     // Send reboot command to the flight controller
     MSP.send_message(MSPCodes.MSP_SET_REBOOT, false, false);
 
+    // Force connection invalid to ensure reboot dialog waits for reconnection
+    CONFIGURATOR.connectionValid = false;
+
     if (currentPort.startsWith("bluetooth") || currentPort === "manual") {
-        return setTimeout(function () {
-            $("a.connection_button__link").trigger("click");
-        }, 1500);
+        if (!PortHandler.portPicker.autoConnect) {
+            return setTimeout(function () {
+                $("a.connection_button__link").trigger("click");
+            }, REBOOT_GRACE_PERIOD_MS);
+        }
     }
 
     // Show reboot progress modal except for cli and presets tab
