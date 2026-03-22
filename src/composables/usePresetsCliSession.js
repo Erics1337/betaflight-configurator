@@ -2,7 +2,7 @@ import { computed, ref } from "vue";
 import $ from "jquery";
 import GUI from "../js/gui";
 import CONFIGURATOR from "../js/data_storage";
-import CliEngine from "../tabs/presets/CliEngine";
+import CliEngine from "../components/tabs/presets/CliEngine";
 
 const READ_DUMP_IDLE_MS = 500;
 const MAX_READ_TIMEOUT = 10000;
